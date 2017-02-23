@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Serve images from localStorage – great for offline apps.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dallasread/img-cacher"
+  },
   "dependencies": {
     "generate-js": "^3.1.2"
   },
