@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ImgCacher</title>
+    </head>
+    <body>
+        <script type="text/javascript" src="./img-cacher.js"></script>
+        <script type="text/javascript">
+            var url = 'http://www.marketingjs.com/assets/car.jpg',
+                imgCacher = new ImgCacher({
+                    prefix: 'img-demo-'
+                });
+
+            imgCacher.src(url, function(err, dataUrl, fromCache) {
+                var img = document.createElement('img');
+
+                if (fromCache) {
+                    document.body.innerHTML += 'Retrieved from localStorage (eg. no network request)... ';
+                } else {
+                    document.body.innerHTML += 'Downloaded from the network... ';
+                }
+
+                if (err) { // Something went wrong! Fallback to the supplied `url`.
+                    document.body.innerHTML += '`src` is HTTP URL.';
+                    img.src = url;
+                } else {
+                    document.body.innerHTML += '`src` is Data URL.';
+                    img.src = dataUrl;
+                }
+
+                document.body.appendChild(img);
+            });
+
+            // Other convenience methods:
+            // imgCacher.isValid(url); // Check if the URL exists
+
+            // imgCacher.getData(url, function(err, data) {
+            //     if (err) return; // An HTTP error occurred
+            //     // console.log(data); // Base64-encoded image
+            // });
+        </script>
+    </body>
+</html>
