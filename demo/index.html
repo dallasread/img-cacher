@@ -7,14 +7,13 @@
     <body>
         <script type="text/javascript" src="./img-cacher.js"></script>
         <script type="text/javascript">
-            var url = 'http://www.marketingjs.com/assets/car.jpg',
+            var img = document.createElement('img'),
+                url = 'http://www.marketingjs.com/assets/car.jpg',
                 imgCacher = new ImgCacher({
                     prefix: 'img-demo-'
                 });
 
             imgCacher.src(url, function(err, dataUrl, fromCache) {
-                var img = document.createElement('img');
-
                 if (fromCache) {
                     document.body.innerHTML += 'Retrieved from localStorage (eg. no network request)... ';
                 } else {
@@ -31,14 +30,6 @@
 
                 document.body.appendChild(img);
             });
-
-            // Other convenience methods:
-            // imgCacher.isValid(url); // Check if the URL exists
-
-            // imgCacher.getData(url, function(err, data) {
-            //     if (err) return; // An HTTP error occurred
-            //     // console.log(data); // Base64-encoded image
-            // });
         </script>
     </body>
 </html>
