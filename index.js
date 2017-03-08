@@ -11,7 +11,8 @@ var ImgCacher = Generator.generate(function ImgCacher(options) {
 ImgCacher.definePrototype({
     src: require('./lib/src'),
     isValid: require('./lib/is-valid'),
-    getData: require('./lib/get-data')
+    getData: require('./lib/get-data'),
+    reset: require('./lib/reset')
 });
 
 if (typeof window !== 'undefined') {
