@@ -9,10 +9,14 @@ var ImgCacher = Generator.generate(function ImgCacher(options) {
 });
 
 ImgCacher.definePrototype({
-    src: require('./lib/src'),
-    isValid: require('./lib/is-valid'),
+    base64Img: require('./lib/base64-img'),
     getData: require('./lib/get-data'),
-    reset: require('./lib/reset')
+    isValid: require('./lib/is-valid'),
+    onload: require('./lib/onload'),
+    reset: require('./lib/reset'),
+    save: require('./lib/save'),
+    src: require('./lib/src'),
+    srcFromCache: require('./lib/src-from-cache')
 });
 
 if (typeof window !== 'undefined') {
