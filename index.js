@@ -16,7 +16,8 @@ ImgCacher.definePrototype({
     reset: require('./lib/reset'),
     save: require('./lib/save'),
     src: require('./lib/src'),
-    srcFromCache: require('./lib/src-from-cache')
+    srcFromCache: require('./lib/src-from-cache'),
+    buildSrc: require('./lib/build-src'),
 });
 
 if (typeof window !== 'undefined') {

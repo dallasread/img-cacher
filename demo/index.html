@@ -13,7 +13,9 @@
                     prefix: 'img-demo-'
                 });
 
-            imgCacher.src(url, function(err, dataUrl, fromCache) {
+            imgCacher.src(url, {
+                maxHeight: 133
+            }, function(err, dataUrl, fromCache) {
                 if (fromCache) {
                     document.body.innerHTML += 'Retrieved from localStorage (eg. no network request)... ';
                 } else {
@@ -28,6 +30,7 @@
                     img.src = dataUrl;
                 }
 
+                document.body.appendChild(document.createElement('hr'));
                 document.body.appendChild(img);
             });
         </script>
