@@ -65,5 +65,5 @@ Serve images from localStorage – great for offline apps.
 
 ## CHANGELOG
 
-1.0.2
-- Add options hash to all methods for all methods that accept a `src`. Options hash can functionally accept `width`, `height`, `maxWidth`, and `maxHeight`.
+- 1.0.2
+  - Add options hash to all methods for all methods that accept a `src`. Options hash can functionally accept `width`, `height`, `maxWidth`, and `maxHeight`.
