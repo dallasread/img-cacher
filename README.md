@@ -10,11 +10,31 @@ Serve images from localStorage – great for offline apps.
             prefix: 'img-demo-'
         });
 
+    // Basic usage
     imgCacher.src(url, { 
         maxWidth: 600,
-        maxHeight: 600,
-        // width: 600,
-        // height: 600,
+        maxHeight: 600
+    }, function(err, dataUrl) {
+        var img = document.createElement('img');
+
+        if (err) { // Something went wrong! Fallback to the supplied `url`.
+            img.src = url;
+        } else {
+            img.src = dataUrl;
+        }
+
+        document.body.appendChild(img);
+    });
+
+    // A Square, Cropped Thumbnail
+    imgCacher.src(url, { 
+        fillWidth: 300,
+        fillHeight: 300,
+        bg: '#ffffff',
+        cropWidth: 300,
+        cropHeight: 300
+        // cropX: 0, // If not supplied, crop is centered horizontally
+        // cropY: 0 // If not supplied, crop is centered vertically
     }, function(err, dataUrl) {
         var img = document.createElement('img');
 
@@ -65,5 +85,14 @@ Serve images from localStorage – great for offline apps.
 
 ## CHANGELOG
 
+1.0.3
+-----
+
+- Added `fillWidth` and `fillHeight`. These maximize the image to the biggest possible area.
+- Added `cropWidth`, `cropHeight`, `cropX`, and `cropY`. These crop your image to the desired size AFTER resizing it and BEFORE storing it locally.
+- Added `bg` which adds a background color to the image (only seen if cropping out of bounds or if your image has a transparent background.
+
 1.0.2
+-----
+
 - Add options hash to all methods for all methods that accept a `src`. Options hash can functionally accept `width`, `height`, `maxWidth`, and `maxHeight`.

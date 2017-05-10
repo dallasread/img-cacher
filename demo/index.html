@@ -14,7 +14,16 @@
                 });
 
             imgCacher.src(url, {
-                maxHeight: 133
+                r: Math.random(), // Just so that we can test stuff :)
+                cropWidth: 300,
+                cropHeight: 300,
+                fillWidth: 300,
+                fillHeight: 300,
+                // bg: 'red',
+                // cropX: 0,
+                // cropY: 0,
+                // maxHeight: 100,
+                // maxWidth: 100,
             }, function(err, dataUrl, fromCache) {
                 if (fromCache) {
                     document.body.innerHTML += 'Retrieved from localStorage (eg. no network request)... ';
