@@ -17,28 +17,27 @@
             for (var i = 5 - 1; i >= 0; i--) {
                 img = document.createElement('img');
 
-                imgCacher.src(url, {
+                imgCacher.src('car', {
                     // r: Math.random(), // Just so that we can test stuff :)
-                    cropWidth: 13,
-                    cropHeight: 13,
-                    fillWidth: 13,
-                    fillHeight: 13,
+                    cropWidth: (i * 10) + 22,
+                    cropHeight: (i * 10) + 22,
+                    fillWidth: (i * 10) + 22,
+                    fillHeight: (i * 10) + 22,
+                    buildSrc: function(done) {
+                        setTimeout(function() {
+                            done(url);
+                        }, 3000);
+                    }
                     // bg: 'red',
                     // cropX: 0,
                     // cropY: 0,
                     // maxHeight: 100,
                     // maxWidth: 100,
-                }, function(err, dataUrl, fromCache) {
+                }, function(err, dataUrl, isNetworkRequest) {
                     var content = '';
 
-                    if (fromCache) {
-                        content += 'Retrieved from localStorage (eg. no network request)... ';
-                    } else {
-                        content += 'Downloaded from the network... ';
-                    }
-
                     if (err) { // Something went wrong! Fallback to the supplied `url`.
-                        content += '`src` is HTTP URL.';
+                        content += 'Something went wrong – falling back to HTTP URL.';
                         img.src = url;
                     } else {
                         content += '`src` is Data URL.';
