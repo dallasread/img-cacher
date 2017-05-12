@@ -1,6 +1,16 @@
 # ImgCacher
 
-Serve images from localStorage – great for offline apps.
+Serve images from localStorage – great for offline apps. Yes, ImgCacher supports resizing & cropping.
+
+Lightning-Quick 3-Level Caching
+===============================
+
+1. ImgCacher will try to look up the image in localStorage. This works across page loads!
+2. If not found, ImgCacher will look up the cropped & resized image in an in-memory store. If you have the same image cropped and sized similarly on a page 1000 times, resizing & cropping will only be executed the first time.
+3. If still not found, ImgCacher will look the image up in an in-memory store of source images. Whether you're loading an image 1 or 1000 times on a page, the source image will be downloaded only once.
+
+How Do I Use ImgCacher?
+=======================
 
 ```
 <script type="text/javascript" src="/path/to/img-cacher.js"></script>
@@ -85,6 +95,13 @@ Serve images from localStorage – great for offline apps.
 ```
 
 ## CHANGELOG
+
+1.0.5
+-----
+
+- Optimize memoization.
+  - Cache input `src` `img` in memory.
+  - Cache generated `base64URL` from options in memory.
 
 1.0.4
 -----

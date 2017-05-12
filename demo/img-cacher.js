@@ -58,21 +58,20 @@
 
 	    _.defineProperties({
 	        logging: typeof options.logging === 'undefined' || typeof options.logging === 'string' ? options.logging : 'ImgCacher',
-	        prefix: options.prefix || 'img-',
-	        memoized: {}
+	        prefix: options.prefix || 'img-'
 	    });
 	});
 
 	ImgCacher.definePrototype({
 	    base64Img: __webpack_require__(3),
-	    getData: __webpack_require__(4),
-	    isValid: __webpack_require__(5),
-	    reset: __webpack_require__(6),
-	    save: __webpack_require__(7),
-	    src: __webpack_require__(8),
-	    srcFromCache: __webpack_require__(9),
-	    buildSrc: __webpack_require__(10),
-	    resolveSrc: __webpack_require__(11),
+	    getImg: __webpack_require__(4),
+	    getData: __webpack_require__(5),
+	    isValid: __webpack_require__(6),
+	    reset: __webpack_require__(7),
+	    save: __webpack_require__(8),
+	    src: __webpack_require__(9),
+	    srcFromCache: __webpack_require__(10),
+	    buildSrc: __webpack_require__(11),
 	    log: __webpack_require__(12)
 	});
 
@@ -453,7 +452,7 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	function applySize(img, options) {
+	function getSize(img, options) {
 	    var ratio = 1,
 	        size = {
 	            width: img.width,
@@ -496,7 +495,7 @@
 	    return size;
 	}
 
-	function applyCrop(img, options, size) {
+	function getCrop(img, options, size) {
 	    return {
 	        x: typeof options.cropX !== 'undefined' ? options.cropX : (options.cropWidth ? (size.width - options.cropWidth) / 2 : 0),
 	        y: typeof options.cropY !== 'undefined' ? options.cropY : (options.cropHeight ? (size.height - options.cropHeight) / 2 : 0),
@@ -505,6 +504,8 @@
 	    };
 	}
 
+	var cached = {};
+
 	module.exports = function base64Img(img, options, done) {
 	    if (typeof options === 'function') {
 	        done = options;
@@ -512,10 +513,17 @@
 	    }
 
 	    var _ = this,
-	        canvas = document.createElement('canvas'),
+	        srcWithOptions = _.buildSrc(img, options);
+
+	    if (cached[srcWithOptions]) {
+	        _.log('base64Img', 'fromMemory', img.src, options);
+	        return done( undefined, cached[srcWithOptions] );
+	    }
+
+	    var canvas = document.createElement('canvas'),
 	        buffer = document.createElement('canvas'),
-	        size = applySize(img, options),
-	        crop = applyCrop(img, options, size);
+	        size = getSize(img, options),
+	        crop = getCrop(img, options, size);
 
 	    buffer.width = size.width;
 	    buffer.height = size.height;
@@ -532,14 +540,69 @@
 
 	    canvas.getContext('2d').drawImage(buffer, crop.x * -1, crop.y * -1, buffer.width, buffer.height);
 
-	    _.log('base64Img', img.src);
+	    cached[srcWithOptions] = canvas.toDataURL();
 
-	    done( undefined, canvas.toDataURL() );
+	    _.log('base64Img', 'noMemory', img.src, options);
+
+	    _.save(img.src, options, cached[srcWithOptions]);
+
+	    done( undefined, cached[srcWithOptions] );
 	};
 
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	var cache = {};
+
+	function resolveImg(src, err, data) {
+	    var img = cache[src],
+	        i = img.callbacks.length;
+
+	    while (i--) {
+	        img.callbacks[i].call(img.callbacks[i], err, data);
+	        delete img.callbacks[i];
+	    }
+	}
+
+	module.exports = function getImg(src, done) {
+	    var _ = this,
+	        img = cache[src];
+
+	    if (img && !img.error) {
+	        if (img.isLoaded) {
+	            _.log('getImg', 'fromMemory', src);
+	            return done(undefined, img);
+	        }
+
+	        _.log('getImg', 'fromMemoryLoading', src);
+	        return img.callbacks.push(done);
+	    }
+
+	    img = cache[src] = window.document.createElement('img');
+
+	    img.callbacks = [done];
+
+	    img.onload = function() {
+	        img.isLoaded = true;
+	        resolveImg(src, undefined, img);
+	    };
+
+	    img.onerror = function onError(err) {
+	        img.error = err;
+	        resolveImg(src, err);
+	    };
+
+	    img.crossOrigin = 'anonymous';
+	    img.src = src;
+
+	    _.log('getImg', 'noMemory', src);
+	}
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports) {
 
 	module.exports = function getData(src, options, done) {
@@ -550,34 +613,20 @@
 	        options = {};
 	    }
 
-	    if (_.memoized[src] instanceof Array) {
-	        _.memoized[src].push(done);
-	        return;
-	    }
+	    _.getImg(src, function(err, img, fromCache) {
+	        if (err) {
+	            return done(err);
+	        }
 
-	    _.memoized[src] = [done];
-
-	    var img = window.document.createElement('img');
-
-	    img.onload = function() {
 	        _.base64Img(img, options, function(err, data) {
-	            _.resolveSrc(src, err, data);
+	            done(err, data, fromCache);
 	        });
-	    };
-
-	    img.onerror = function onError(err) {
-	        _.resolveSrc(src, err);
-	    };
-
-	    img.crossOrigin = 'anonymous';
-	    img.src = src;
-
-	    _.log('getData', src);
+	    });
 	};
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	module.exports = function isValid(src) {
@@ -595,7 +644,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	module.exports = function reset() {
@@ -616,7 +665,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = function saveSrc(src, options, data) {
@@ -632,43 +681,38 @@
 	        data
 	    );
 
-	    _.log('save', src);
+	    _.log('save', src, options);
 	};
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	module.exports = function getSrc(src, options, done) {
 	    var _ = this;
 
-	    _.log('getSrc', src);
-
 	    _.srcFromCache(src, options, function(err, data) {
 	        if (err) {
-	            return _.getData(src, options, function(err, data, firstCallback) {
+	            return _.getData(src, options, function(err, data) {
 	                if (data) {
-	                    if (firstCallback) {
-	                        _.save(src, options, data);
-	                    }
-
-	                    _.log('resolve', src);
-
-	                    done(undefined, data, !firstCallback);
+	                    _.log('getSrc', 'success', 'noLocalStorage', src, options);
+	                    done(undefined, data);
 	                } else {
+	                    _.log('getSrc', 'error', src, options);
 	                    done(err);
 	                }
 	            });
 	        }
 
+	        _.log('getSrc', 'success', 'fromLocalStorage', src, options);
 	        done(undefined, data, true);
 	    });
 	};
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = function cacheFromSrc(src, options, done) {
@@ -683,20 +727,9 @@
 	        done(undefined, src);
 	    } else {
 	        var exists = window.localStorage.getItem( _.buildSrc(src, options) );
-	        if (exists) _.log('cacheFromSrc', src);
+	        if (exists) _.log('cacheFromSrc', 'fromLocalStorage', src, options);
 	        done(exists ? undefined : new Error('Image does not exist.'), exists);
 	    }
-	};
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	module.exports = function buildSrc(src, options) {
-	    var _ = this;
-	    options = typeof options === 'object' ? options : {};
-	    return _.prefix + src + '-' + JSON.stringify(options);
 	};
 
 
@@ -704,17 +737,10 @@
 /* 11 */
 /***/ function(module, exports) {
 
-	module.exports = function resolveSrc(src, err, data) {
-	    var _ = this,
-	        callbacks = _.memoized[src];
-
-	    if (callbacks instanceof Array) {
-	        for (var i = 0; i < callbacks.length; i++) {
-	            callbacks[i].call(_, err, data, i === 0);
-	        }
-	    }
-
-	    delete _.memoized[src];
+	module.exports = function buildSrc(src, options) {
+	    var _ = this;
+	    options = typeof options === 'object' ? options : {};
+	    return _.prefix + src + '-' + JSON.stringify(options);
 	};
 
 
