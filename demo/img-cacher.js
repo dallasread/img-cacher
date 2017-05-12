@@ -70,7 +70,7 @@
 	    reset: __webpack_require__(7),
 	    save: __webpack_require__(8),
 	    src: __webpack_require__(9),
-	    srcFromLocalStorage: __webpack_require__(13),
+	    srcFromLocalStorage: __webpack_require__(10),
 	    buildSrc: __webpack_require__(11),
 	    log: __webpack_require__(12)
 	});
@@ -594,8 +594,8 @@
 	    };
 
 	    if (typeof options.src === 'function') {
-	        options.src.call(_, function(src) {
-	            img.src = src;
+	        options.src.call(_, cacheKey, function(newSrc) {
+	            img.src = newSrc;
 	        });
 	    } else {
 	        img.src = options.src || cacheKey;
@@ -720,7 +720,23 @@
 
 
 /***/ },
-/* 10 */,
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = function cacheFromSrc(cacheKey, done) {
+	    var _ = this;
+
+	    if (cacheKey.slice(0, 5) === 'data:') {
+	        done(undefined, cacheKey);
+	    } else {
+	        var exists = window.localStorage.getItem( cacheKey );
+	        if (exists) _.log('cacheFromSrc', 'fromLocalStorage', cacheKey);
+	        done(exists ? undefined : new Error('Image does not exist.'), exists);
+	    }
+	};
+
+
+/***/ },
 /* 11 */
 /***/ function(module, exports) {
 
@@ -742,23 +758,6 @@
 	        var args = Array.prototype.slice.call(arguments);
 	        args.unshift(_.logging + ' ~>');
 	        console.debug.apply(console.debug, args);
-	    }
-	};
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	module.exports = function cacheFromSrc(cacheKey, done) {
-	    var _ = this;
-
-	    if (cacheKey.slice(0, 5) === 'data:') {
-	        done(undefined, cacheKey);
-	    } else {
-	        var exists = window.localStorage.getItem( cacheKey );
-	        if (exists) _.log('cacheFromSrc', 'fromLocalStorage', cacheKey);
-	        done(exists ? undefined : new Error('Image does not exist.'), exists);
 	    }
 	};
 

@@ -68,6 +68,11 @@ How Do I Use ImgCacher?
 
 ## CHANGELOG
 
+1.0.7
+-----
+
+- Added `cacheKey` as first argument to the dynamic `src` function
+
 1.0.6
 -----
 
