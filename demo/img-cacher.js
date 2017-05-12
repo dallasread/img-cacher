@@ -57,7 +57,9 @@
 	    var _ = this;
 
 	    _.defineProperties({
-	        prefix: options.prefix || 'img-'
+	        logging: typeof options.logging === 'undefined' || typeof options.logging === 'string' ? options.logging : 'ImgCacher',
+	        prefix: options.prefix || 'img-',
+	        memoized: {}
 	    });
 	});
 
@@ -65,12 +67,13 @@
 	    base64Img: __webpack_require__(3),
 	    getData: __webpack_require__(4),
 	    isValid: __webpack_require__(5),
-	    onload: __webpack_require__(6),
-	    reset: __webpack_require__(7),
-	    save: __webpack_require__(8),
-	    src: __webpack_require__(9),
-	    srcFromCache: __webpack_require__(10),
-	    buildSrc: __webpack_require__(11),
+	    reset: __webpack_require__(6),
+	    save: __webpack_require__(7),
+	    src: __webpack_require__(8),
+	    srcFromCache: __webpack_require__(9),
+	    buildSrc: __webpack_require__(10),
+	    resolveSrc: __webpack_require__(11),
+	    log: __webpack_require__(12)
 	});
 
 	if (typeof window !== 'undefined') {
@@ -508,7 +511,8 @@
 	        options = {};
 	    }
 
-	    var canvas = document.createElement('canvas'),
+	    var _ = this,
+	        canvas = document.createElement('canvas'),
 	        buffer = document.createElement('canvas'),
 	        size = applySize(img, options),
 	        crop = applyCrop(img, options, size);
@@ -528,6 +532,8 @@
 
 	    canvas.getContext('2d').drawImage(buffer, crop.x * -1, crop.y * -1, buffer.width, buffer.height);
 
+	    _.log('base64Img', img.src);
+
 	    done( undefined, canvas.toDataURL() );
 	};
 
@@ -537,26 +543,36 @@
 /***/ function(module, exports) {
 
 	module.exports = function getData(src, options, done) {
+	    var _ = this;
+
 	    if (typeof options === 'function') {
 	        done = options;
 	        options = {};
 	    }
 
-	    if (!this.isValid(src)) return done(new Error('Invalid src.'));
+	    if (_.memoized[src] instanceof Array) {
+	        _.memoized[src].push(done);
+	        return;
+	    }
 
-	    var _ = this,
-	        img = window.document.createElement('img');
+	    _.memoized[src] = [done];
+
+	    var img = window.document.createElement('img');
 
 	    img.onload = function() {
-	        _.base64Img(img, options, done);
+	        _.base64Img(img, options, function(err, data) {
+	            _.resolveSrc(src, err, data);
+	        });
 	    };
 
 	    img.onerror = function onError(err) {
-	        done(err);
+	        _.resolveSrc(src, err);
 	    };
 
 	    img.crossOrigin = 'anonymous';
 	    img.src = src;
+
+	    _.log('getData', src);
 	};
 
 
@@ -582,22 +598,6 @@
 /* 6 */
 /***/ function(module, exports) {
 
-	module.exports = function onload(img, done) {
-	    var canvas = document.createElement('canvas');
-
-	    canvas.height = img.height;
-	    canvas.width = img.width;
-
-	    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-
-	    done( undefined, canvas.toDataURL() );
-	};
-
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
 	module.exports = function reset() {
 	    var _ = this,
 	        localStorage = window.localStorage,
@@ -610,11 +610,13 @@
 	            localStorage.removeItem(localStorage.key(i));
 	        }
 	    }
+
+	    _.log('reset');
 	};
 
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	module.exports = function saveSrc(src, options, data) {
@@ -629,22 +631,31 @@
 	        _.buildSrc(src, options),
 	        data
 	    );
+
+	    _.log('save', src);
 	};
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = function getSrc(src, options, done) {
 	    var _ = this;
 
+	    _.log('getSrc', src);
+
 	    _.srcFromCache(src, options, function(err, data) {
 	        if (err) {
-	            return _.getData(src, options, function(err, data) {
+	            return _.getData(src, options, function(err, data, firstCallback) {
 	                if (data) {
-	                    _.save(src, options, data);
-	                    done(undefined, data);
+	                    if (firstCallback) {
+	                        _.save(src, options, data);
+	                    }
+
+	                    _.log('resolve', src);
+
+	                    done(undefined, data, !firstCallback);
 	                } else {
 	                    done(err);
 	                }
@@ -657,7 +668,7 @@
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports) {
 
 	module.exports = function cacheFromSrc(src, options, done) {
@@ -672,8 +683,20 @@
 	        done(undefined, src);
 	    } else {
 	        var exists = window.localStorage.getItem( _.buildSrc(src, options) );
+	        if (exists) _.log('cacheFromSrc', src);
 	        done(exists ? undefined : new Error('Image does not exist.'), exists);
 	    }
+	};
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = function buildSrc(src, options) {
+	    var _ = this;
+	    options = typeof options === 'object' ? options : {};
+	    return _.prefix + src + '-' + JSON.stringify(options);
 	};
 
 
@@ -681,10 +704,32 @@
 /* 11 */
 /***/ function(module, exports) {
 
-	module.exports = function buildSrc(src, options) {
+	module.exports = function resolveSrc(src, err, data) {
+	    var _ = this,
+	        callbacks = _.memoized[src];
+
+	    if (callbacks instanceof Array) {
+	        for (var i = 0; i < callbacks.length; i++) {
+	            callbacks[i].call(_, err, data, i === 0);
+	        }
+	    }
+
+	    delete _.memoized[src];
+	};
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = function log() {
 	    var _ = this;
-	    options = typeof options === 'object' ? options : {};
-	    return _.prefix + src + '-' + JSON.stringify(options);
+
+	    if (_.logging) {
+	        var args = Array.prototype.slice.call(arguments);
+	        args.unshift(_.logging + ' ~>');
+	        console.debug.apply(console.debug, args);
+	    }
 	};
 
 

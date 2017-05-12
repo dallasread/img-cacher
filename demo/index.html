@@ -7,41 +7,49 @@
     <body>
         <script type="text/javascript" src="./img-cacher.js"></script>
         <script type="text/javascript">
-            var img = document.createElement('img'),
-                url = 'http://www.marketingjs.com/assets/car.jpg',
-                imgCacher = new ImgCacher({
-                    prefix: 'img-demo-'
+            var url = 'http://www.marketingjs.com/assets/car.jpg',
+                imgCacher = new window.ImgCacher({
+                    prefix: 'img-demo-',
+                    logging: 'imgCacher'
+                }),
+                img;
+
+            for (var i = 5 - 1; i >= 0; i--) {
+                img = document.createElement('img');
+
+                imgCacher.src(url, {
+                    // r: Math.random(), // Just so that we can test stuff :)
+                    cropWidth: 35,
+                    cropHeight: 35,
+                    fillWidth: 35,
+                    fillHeight: 35,
+                    // bg: 'red',
+                    // cropX: 0,
+                    // cropY: 0,
+                    // maxHeight: 100,
+                    // maxWidth: 100,
+                }, function(err, dataUrl, fromCache) {
+                    var content = '';
+
+                    if (fromCache) {
+                        content += 'Retrieved from localStorage (eg. no network request)... ';
+                    } else {
+                        content += 'Downloaded from the network... ';
+                    }
+
+                    if (err) { // Something went wrong! Fallback to the supplied `url`.
+                        content += '`src` is HTTP URL.';
+                        img.src = url;
+                    } else {
+                        content += '`src` is Data URL.';
+                        img.src = dataUrl;
+                    }
+
+                    document.body.appendChild(document.createElement('hr'));
+                    document.body.innerHTML += content + '<br>';
+                    document.body.appendChild(img);
                 });
-
-            imgCacher.src(url, {
-                r: Math.random(), // Just so that we can test stuff :)
-                cropWidth: 300,
-                cropHeight: 300,
-                fillWidth: 300,
-                fillHeight: 300,
-                // bg: 'red',
-                // cropX: 0,
-                // cropY: 0,
-                // maxHeight: 100,
-                // maxWidth: 100,
-            }, function(err, dataUrl, fromCache) {
-                if (fromCache) {
-                    document.body.innerHTML += 'Retrieved from localStorage (eg. no network request)... ';
-                } else {
-                    document.body.innerHTML += 'Downloaded from the network... ';
-                }
-
-                if (err) { // Something went wrong! Fallback to the supplied `url`.
-                    document.body.innerHTML += '`src` is HTTP URL.';
-                    img.src = url;
-                } else {
-                    document.body.innerHTML += '`src` is Data URL.';
-                    img.src = dataUrl;
-                }
-
-                document.body.appendChild(document.createElement('hr'));
-                document.body.appendChild(img);
-            });
+            }
         </script>
     </body>
 </html>

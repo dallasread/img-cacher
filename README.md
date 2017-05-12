@@ -6,8 +6,9 @@ Serve images from localStorage – great for offline apps.
 <script type="text/javascript" src="/path/to/img-cacher.js"></script>
 <script type="text/javascript">
     var url = 'http://www.marketingjs.com/assets/car.jpg',
-        imgCacher = new ImgCacher({
-            prefix: 'img-demo-'
+        imgCacher = new window.ImgCacher({
+            prefix: 'img-demo-',
+            logging: 'imgCacher'
         });
 
     // Basic usage
@@ -84,6 +85,13 @@ Serve images from localStorage – great for offline apps.
 ```
 
 ## CHANGELOG
+
+1.0.4
+-----
+
+- Added `logging` option to `ImgCacher`.
+- Memoization of `getData` for an immense speed boost. Now, if you `getData` the same `src` 20 times in parallel, only 1 request will be sent remotely, but all 20 callbacks will be fired as expected. This means only 1 remote request (instead of 20) and 1 save to localStorage (instead of 20). 
+- Adding `img-cacher.min.js` to the `demo` folder in future version releases.
 
 1.0.3
 -----
