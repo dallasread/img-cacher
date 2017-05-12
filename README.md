@@ -12,7 +12,7 @@ Lightning-Quick 3-Level Caching
 How Do I Use ImgCacher?
 =======================
 
-```
+```html
 <script type="text/javascript" src="/path/to/img-cacher.js"></script>
 <script type="text/javascript">
     var url = 'http://www.marketingjs.com/assets/car.jpg',
