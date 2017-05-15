@@ -513,7 +513,7 @@
 	    }
 
 	    var _ = this,
-	        srcWithOptions = _.buildSrc(img, options);
+	        srcWithOptions = _.buildSrc(img.src, options);
 
 	    if (cached[srcWithOptions]) {
 	        _.log('base64Img', 'fromMemory', img.src, options);
@@ -570,11 +570,11 @@
 
 	    if (img && !img.error) {
 	        if (img.isLoaded) {
-	            _.log('getImg', 'fromMemory', cacheKey);
+	            _.log('getImg', 'fromMemory', cacheKey, options);
 	            return done(undefined, img);
 	        }
 
-	        _.log('getImg', 'fromMemoryLoading', cacheKey);
+	        _.log('getImg', 'fromMemoryLoading', cacheKey, options);
 	        return img.callbacks.push(done);
 	    }
 
@@ -601,7 +601,7 @@
 	        img.src = options.src || cacheKey;
 	    }
 
-	    _.log('getImg', 'noMemory', cacheKey);
+	    _.log('getImg', 'noMemory', cacheKey, options);
 	}
 
 

@@ -68,6 +68,11 @@ How Do I Use ImgCacher?
 
 ## CHANGELOG
 
+1.1.0
+-----
+
+- Fixed a bug in caching `base64Img` src images.
+
 1.0.7
 -----
 

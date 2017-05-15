@@ -7,26 +7,30 @@
     <body>
         <script type="text/javascript" src="./img-cacher.js"></script>
         <script type="text/javascript">
-            var url = 'http://www.marketingjs.com/assets/car.jpg',
-                imgCacher = new window.ImgCacher({
+            var imgCacher = new window.ImgCacher({
                     prefix: 'img-demo-',
                     logging: 'imgCacher'
                 }),
-                img;
+                srcs = [
+                    'samples/cat-a.jpg',
+                    'samples/cat-b.jpg',
+                    'samples/cat-c.jpg'
+                ],
+                r = Math.random(),
+                size = 45;
 
-            for (var i = 5 - 1; i >= 0; i--) {
-                img = document.createElement('img');
+            srcs.forEach(function(src) {
+                var img = document.createElement('img');
 
-                imgCacher.src('car', {
-                    // r: Math.random(), // Just so that we can test stuff :)
-                    cropWidth: (i * 10) + 23,
-                    cropHeight: (i * 10) + 23,
-                    fillWidth: (i * 10) + 23,
-                    fillHeight: (i * 10) + 23,
+                imgCacher.src(src, {
+                    // r: r, // Just so that we can test stuff :)
+                    cropWidth: size,
+                    cropHeight: size,
+                    fillWidth: size,
+                    fillHeight: size,
                     src: function(cacheKey, done) {
-                        // cacheKey === 'car'
                         setTimeout(function() {
-                            done(url);
+                            done(src);
                         }, 3000);
                     }
                     // bg: 'red',
@@ -39,7 +43,7 @@
 
                     if (err) { // Something went wrong! Fallback to the supplied `url`.
                         content += 'Something went wrong – falling back to HTTP URL.';
-                        img.src = url;
+                        img.src = src;
                     } else {
                         content += '`src` is Data URL.';
                         img.src = dataUrl;
@@ -49,7 +53,8 @@
                     document.body.innerHTML += content + '<br>';
                     document.body.appendChild(img);
                 });
-            }
+            });
+
         </script>
     </body>
 </html>
