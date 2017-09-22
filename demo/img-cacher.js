@@ -580,7 +580,7 @@
 
 	    img = cache[cacheKey] = window.document.createElement('img');
 
-	    img.crossOrigin = 'anonymous';
+	    img.setAttribute('crossOrigin', 'anonymous');
 	    img.callbacks = [done];
 
 	    img.onload = function() {

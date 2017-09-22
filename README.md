@@ -68,6 +68,12 @@ How Do I Use ImgCacher?
 
 ## CHANGELOG
 
+1.1.1
+-----
+
+- Anti-aliasing support
+
+
 1.1.0
 -----
 

@@ -11,33 +11,37 @@
                     prefix: 'img-demo-',
                     logging: 'imgCacher'
                 }),
+                size = 110,
                 srcs = [
                     'samples/cat-a.jpg',
                     'samples/cat-b.jpg',
-                    'samples/cat-c.jpg'
+                    'samples/cat-c.jpg',
+                    // 'https://www.gravatar.com/avatar/6e090ce190ad7ebd76462bd8a20d3f7d?s=20&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
                 ],
-                r = Math.random(),
-                size = 45;
+                r = Math.random();
 
             srcs.forEach(function(src) {
                 var img = document.createElement('img');
 
                 imgCacher.src(src, {
-                    // r: r, // Just so that we can test stuff :)
+                    r: r, // Just so that we can test stuff :)
                     cropWidth: size,
                     cropHeight: size,
+                    cropX: 0,
+                    cropY: 0,
                     fillWidth: size,
                     fillHeight: size,
-                    src: function(cacheKey, done) {
-                        setTimeout(function() {
-                            done(src);
-                        }, 3000);
-                    }
+                    // src: function(cacheKey, done) {
+                    //     setTimeout(function() {
+                    //         done(src);
+                    //     }, 3000);
+                    // },
                     // bg: 'red',
-                    // cropX: 0,
-                    // cropY: 0,
-                    // maxHeight: 100,
-                    // maxWidth: 100,
+                    // maxHeight: size,
+                    // maxWidth: size,
                 }, function(err, dataUrl, isNetworkRequest) {
                     var content = '';
 
@@ -52,6 +56,12 @@
                     document.body.appendChild(document.createElement('hr'));
                     document.body.innerHTML += content + '<br>';
                     document.body.appendChild(img);
+
+                    var original = document.createElement('img');
+                    original.src = src;
+                    original.height = size;
+                    document.body.innerHTML += '<br>Original:<br>';
+                    document.body.appendChild(original);
                 });
             });
 
