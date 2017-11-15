@@ -71,6 +71,13 @@ How Do I Use ImgCacher?
 1.1.1
 -----
 
+- Fix for log (works better with browser defaults).
+- Fix for multiple images loading on the same page, but different sizes.
+
+
+1.1.1
+-----
+
 - Anti-aliasing support
 
 
