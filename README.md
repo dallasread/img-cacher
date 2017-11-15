@@ -68,7 +68,13 @@ How Do I Use ImgCacher?
 
 ## CHANGELOG
 
-1.1.1
+1.1.3
+-----
+
+- Fix cross-origin.
+
+
+1.1.2
 -----
 
 - Fix for log (works better with browser defaults).
