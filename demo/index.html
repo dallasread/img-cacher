@@ -13,13 +13,17 @@
                 }),
                 size = 110,
                 srcs = [
-                    'samples/cat-a.jpg',
-                    'samples/cat-b.jpg',
-                    'samples/cat-c.jpg',
+                    // 'samples/cat-a.jpg',
+                    // 'samples/cat-b.jpg',
+                    // 'samples/cat-c.jpg',
                     // 'https://www.gravatar.com/avatar/6e090ce190ad7ebd76462bd8a20d3f7d?s=' + size + '&d=404',
-                    'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
-                    'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
-                    'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    // 'https://www.gravatar.com/avatar/222e556c1434331e9f5e915ee23f0fad?s=' + size + '&d=404',
+                    'https://wza70micu5.execute-api.us-east-1.amazonaws.com/dev/download?key=task/5aa3a36f4ba51c8bb10a/uploads/6cb7b3bd3a314eb2e918/IMG_4598.PNG&authorization=1%3AWebToken%2FHDjrlQ2OPkSq6jWd9FubGa8IKX67KrZjjxR%2BqIcu%2FyCh1tjMxVdI6y5cudPUTnZHpev3d%2Boew86ZJGWkCrAG7Q%3D%3D'
                 ],
                 r = Math.random();
 
@@ -28,18 +32,20 @@
 
                 imgCacher.src(src, {
                     r: r, // Just so that we can test stuff :)
-                    cropWidth: size,
-                    cropHeight: size,
-                    cropX: 0,
-                    cropY: 0,
-                    fillWidth: size,
-                    fillHeight: size,
+                    // cropWidth: size * Math.random(),
+                    // cropHeight: size * Math.random(),
+                    // cropX: 0,
+                    // cropY: 0,
+                    type: 'image/jpeg',
+                    encoderOptions: 0.95,
+                    fillWidth: size * Math.random(),
+                    fillHeight: size * Math.random(),
                     // src: function(cacheKey, done) {
                     //     setTimeout(function() {
                     //         done(src);
                     //     }, 3000);
                     // },
-                    // bg: 'red',
+                    bg: '#fff',
                     // maxHeight: size,
                     // maxWidth: size,
                 }, function(err, dataUrl, isNetworkRequest) {

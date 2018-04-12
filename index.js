@@ -4,6 +4,8 @@ var ImgCacher = Generator.generate(function ImgCacher(options) {
     var _ = this;
 
     _.defineProperties({
+        writable: true
+    }, {
         logging: typeof options.logging === 'undefined' || typeof options.logging === 'string' ? options.logging : 'ImgCacher',
         prefix: options.prefix || 'img-'
     });

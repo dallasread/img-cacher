@@ -68,6 +68,12 @@ How Do I Use ImgCacher?
 
 ## CHANGELOG
 
+1.1.4
+-----
+
+- New base64Img options passed to `toDataURL`: `options.type`, `options.encoderOptions`.
+
+
 1.1.3
 -----
 
